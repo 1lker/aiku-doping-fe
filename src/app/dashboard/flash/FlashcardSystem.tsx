@@ -42,7 +42,11 @@ export default function StudyPage() {
   };
 
   return (
+    
     <div className="min-h-screen bg-gray-50 py-8">
+      <p className="text-center text-gray-600 text-sm">
+
+        </p>  
       <div className="max-w-4xl mx-auto px-4">
         <AnimatePresence mode="wait">
           {status === StudyStatus.NOT_STARTED ? (
