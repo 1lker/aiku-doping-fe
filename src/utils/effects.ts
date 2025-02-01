@@ -54,6 +54,14 @@ class GameEffects {
     await this.playSound('/sounds/tick.mp3');
   }
 
+  public async playWinSound() {
+    await this.playSound('/sounds/win.mp3');
+  }
+
+    public async playPointSound() {
+        await this.playSound('/sounds/point.mp3');
+    }
+
   public celebrateWin() {
     const duration = 3000;
     const animationEnd = Date.now() + duration;
