@@ -250,7 +250,7 @@ const ProfileCreateForm: React.FC<ProfileFormType> = ({
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder='John'
+                          placeholder='İlker'
                           {...field}
                         />
                       </FormControl>
@@ -284,7 +284,7 @@ const ProfileCreateForm: React.FC<ProfileFormType> = ({
                       <FormControl>
                         <Input
                           disabled={loading}
-                          placeholder='johndoe@gmail.com'
+                          placeholder='ilkeryoru@gmail.com'
                           {...field}
                         />
                       </FormControl>
