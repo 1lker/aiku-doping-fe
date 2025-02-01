@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Award, ArrowRight, Share2 } from "lucide-react";
 import confetti from 'canvas-confetti';
-import Image from 'next/image';
-
+import { gameEffects } from '@/utils/effects';
+import { useEffect } from 'react';
 
 interface Player {
   id: string;
@@ -19,16 +19,48 @@ interface Player {
 interface MatchResultProps {
   player1: Player;
   player2: Player;
+  layerStats: {
+    player1: Player;
+    player2: Player;
+  };
   onPlayAgain: () => void;
 }
 
 export const MatchResult: React.FC<MatchResultProps> = ({
   player1,
   player2,
+  layerStats,
   onPlayAgain,
 }) => {
+
   const winner = player1.score > player2.score ? player1 : player2;
-  const loser = winner === player1 ? player2 : player1;
+  const loser = player1.score < player2.score ? player1 : player2;
+
+  // Oyun sonu efektleri
+  useEffect(() => {
+    // Zafer konfetisi
+    gameEffects.celebrateWin();
+
+    // Zafer sesi
+    gameEffects.playWinSound();
+    
+    // Skor animasyonu
+    const pointDiff = winner.score - loser.score;
+    const duration = 2000; // 2 saniye
+    const fps = 60;
+    const frames = duration / (1000 / fps);
+    const increment = pointDiff / frames;
+
+    let frame = 0;
+    const animate = () => {
+      if (frame < frames) {
+        gameEffects.playPointSound();
+        frame++;
+        requestAnimationFrame(animate);
+      }
+    };
+    animate();
+  }, []);
 
   React.useEffect(() => {
     // Victory confetti animation
@@ -89,11 +121,9 @@ export const MatchResult: React.FC<MatchResultProps> = ({
             className="text-center py-6"
           >
             <div className="inline-block relative">
-              <Image
+              <img
                 src={winner.avatar}
                 alt={winner.name}
-                width={96}
-                height={96}
                 className="w-24 h-24 rounded-full border-4 border-yellow-500"
               />
               <motion.div
@@ -128,7 +158,7 @@ export const MatchResult: React.FC<MatchResultProps> = ({
                   </span>
                   <ArrowRight className="h-4 w-4 text-gray-400" />
                   <span className={`text-lg font-semibold ${
-                    (player.newRank ?? 0) < (player.previousRank ?? 0)
+                    (player.newRank ?? 0) < (player.previousRank ?? 0) 
                       ? 'text-green-500' 
                       : 'text-red-500'
                   }`}>
@@ -162,3 +192,4 @@ export const MatchResult: React.FC<MatchResultProps> = ({
 };
 
 export default MatchResult;
+
