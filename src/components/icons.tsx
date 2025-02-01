@@ -30,7 +30,9 @@ import {
   UserCircle2Icon,
   UserPen,
   UserX2Icon,
-  X
+  X,
+  Gamepad2Icon,
+  FlaskConicalIcon
 } from 'lucide-react';
 
 export type Icon = LucideIcon;
@@ -63,7 +65,9 @@ export const Icons = {
   pizza: Pizza,
   sun: SunMedium,
   moon: Moon,
+  game: Gamepad2Icon,
   laptop: Laptop,
+  flashcards: FlaskConicalIcon,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden='true'
