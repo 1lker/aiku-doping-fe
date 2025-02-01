@@ -32,7 +32,8 @@ import {
   UserX2Icon,
   X,
   Gamepad2Icon,
-  FlaskConicalIcon
+  FlaskConicalIcon,
+  BrainIcon
 } from 'lucide-react';
 
 export type Icon = LucideIcon;
@@ -67,6 +68,7 @@ export const Icons = {
   moon: Moon,
   game: Gamepad2Icon,
   laptop: Laptop,
+  brain: BrainIcon,
   flashcards: FlaskConicalIcon,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
