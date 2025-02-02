@@ -50,7 +50,7 @@ import Image from 'next/image';
 export const company = {
   name: 'Doping Hafıza & Coderspace',
   logo: '/doping.png',
-  plan: 'Enterprise'
+  plan: 'Kişiselleştirilmiş Bir Deneyim'
 };
 
 export default function AppSidebar() {
@@ -78,7 +78,7 @@ export default function AppSidebar() {
       </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
         <SidebarGroup>
-          <SidebarGroupLabel>Overview</SidebarGroupLabel>
+          <SidebarGroupLabel>AI Modüller</SidebarGroupLabel>
           <SidebarMenu>
             {navItems.map((item) => {
               const Icon = item.icon ? Icons[item.icon] : Icons.logo;
@@ -199,21 +199,21 @@ export default function AppSidebar() {
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
                     <BadgeCheck />
-                    Account
+                    Hesabım
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <CreditCard />
-                    Billing
+                    Fatura
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Bell />
-                    Notifications
+                    Bildirimler
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut()}>
                   <LogOut />
-                  Log out
+                  Çıkış Yap
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
