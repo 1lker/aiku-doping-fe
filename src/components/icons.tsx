@@ -1,3 +1,4 @@
+import { min } from 'd3';
 import {
   AlertTriangle,
   ArrowRight,
@@ -33,7 +34,8 @@ import {
   X,
   Gamepad2Icon,
   FlaskConicalIcon,
-  BrainIcon
+  BrainIcon,
+  LocateFixedIcon
 } from 'lucide-react';
 
 export type Icon = LucideIcon;
@@ -70,6 +72,7 @@ export const Icons = {
   laptop: Laptop,
   brain: BrainIcon,
   flashcards: FlaskConicalIcon,
+  mindMap: LocateFixedIcon,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden='true'
