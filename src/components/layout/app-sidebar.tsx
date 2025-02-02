@@ -45,10 +45,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import { Icons } from '../icons';
+import Image from 'next/image';
 
 export const company = {
-  name: 'Acme Inc',
-  logo: GalleryVerticalEnd,
+  name: 'Doping Hafıza & Coderspace',
+  logo: '/doping.png',
   plan: 'Enterprise'
 };
 
@@ -62,7 +63,12 @@ export default function AppSidebar() {
       <SidebarHeader>
         <div className='flex gap-2 py-2 text-sidebar-accent-foreground'>
           <div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
-            <company.logo className='size-4' />
+            <Image
+              src={company.logo}
+              alt={company.name}
+              width={32}
+              height={32}
+            />
           </div>
           <div className='grid flex-1 text-left text-sm leading-tight'>
             <span className='truncate font-semibold'>{company.name}</span>
