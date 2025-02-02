@@ -29,6 +29,8 @@ export const useFlashcardSystem = ({
     }
   }, [status, startTime]);
 
+  // src/hooks/use-flashcard-system.ts
+
   const handleGenerateFlashcards = useCallback(
     async (course: string, units: string[]) => {
       setLoading(true);
@@ -44,22 +46,28 @@ export const useFlashcardSystem = ({
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to generate flashcards');
+          if (errorData.error) {
+            setError(errorData.error);
+          } else {
+            setError('Failed to generate flashcards');
+          }
+        } else {
+          const data = await response.json();
+          const cards = enableShuffling
+            ? shuffleFlashcards(data.flashcards)
+            : data.flashcards;
+
+          setFlashcards(cards);
+          setCurrentIndex(0);
+          setIsFlipped(false);
+          setSessions([]);
+          setStartTime(Date.now());
+          setStatus(StudyStatus.IN_PROGRESS);
         }
-
-        const data = await response.json();
-        const cards = enableShuffling
-          ? shuffleFlashcards(data.flashcards)
-          : data.flashcards;
-
-        setFlashcards(cards);
-        setCurrentIndex(0);
-        setIsFlipped(false);
-        setSessions([]);
-        setStartTime(Date.now());
-        setStatus(StudyStatus.IN_PROGRESS);
       } catch (error) {
-        setError(error instanceof Error ? error.message : 'An error occurred');
+        setError(
+          error instanceof Error ? error.message : 'An unknown error occurred'
+        );
         console.error('Error generating flashcards:', error);
       } finally {
         setLoading(false);
