@@ -35,7 +35,8 @@ import {
   Gamepad2Icon,
   FlaskConicalIcon,
   BrainIcon,
-  LocateFixedIcon
+  LocateFixedIcon,
+  PodcastIcon
 } from 'lucide-react';
 
 export type Icon = LucideIcon;
@@ -73,6 +74,7 @@ export const Icons = {
   brain: BrainIcon,
   flashcards: FlaskConicalIcon,
   mindMap: LocateFixedIcon,
+  podcast: PodcastIcon,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden='true'

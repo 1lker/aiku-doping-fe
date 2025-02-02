@@ -170,7 +170,7 @@ const MermaidRenderer: React.FC<MermaidRendererProps> = ({
     <div className='mx-auto grid w-full max-w-6xl grid-cols-1 gap-4 lg:grid-cols-2'>
       <Card>
         <CardHeader>
-          <CardTitle>Mermaid Code</CardTitle>
+          <CardTitle>Zihin Ağacı</CardTitle>
         </CardHeader>
         <CardContent>
           <Textarea
@@ -184,7 +184,7 @@ const MermaidRenderer: React.FC<MermaidRendererProps> = ({
 
       <Card>
         <CardHeader className='flex flex-row items-center justify-between'>
-          <CardTitle>Rendered Diagram</CardTitle>
+          <CardTitle>Zihin Diagram</CardTitle>
           <div className='flex items-center gap-2'>
             <Button
               variant='outline'

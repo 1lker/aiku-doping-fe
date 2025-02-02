@@ -11,24 +11,25 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { courseId, unitId } = body;
 
-    // Burada gerçek API çağrısı yapılacak
-    // const response = await fetch(process.env.AI_API_URL!, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': `Bearer ${process.env.AI_API_KEY}`,
-    //   },
-    //   body: JSON.stringify({ courseId, unitId }),
-    // });
+    const response = await fetch(
+      'https://8e69-188-119-16-233.ngrok-free.app/generate-mindmap',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ topic: courseId + ' ' + unitId })
+      }
+    );
 
-    // if (!response.ok) {
-    //   throw new Error('API error');
-    // }
+    if (!response.ok) {
+      throw new Error('API error');
+    }
 
-    // const data = await response.json();
+    const data = await response.json();
 
     // Mock veriyi döndür
-    return NextResponse.json(MOCK_MINDMAP);
+    return NextResponse.json(data);
   } catch (error) {
     console.error('Error generating mindmap:', error);
     return NextResponse.json(

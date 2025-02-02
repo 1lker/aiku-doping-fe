@@ -1,4 +1,3 @@
-// src/hooks/useStudySession.ts
 import { useState, useCallback, useEffect } from 'react';
 
 interface Question {
@@ -38,18 +37,19 @@ export const useStudySession = (courseId: string, unitIds: string[]) => {
 
   const fetchQuestions = useCallback(async () => {
     if (!courseId || !unitIds.length) return;
-    
+
     setLoading(true);
     try {
-      const response = await fetch('/api/study-questions', {
-        method: 'POST',
+      const queryParams = new URLSearchParams({
+        courseId,
+        unitIds: JSON.stringify(unitIds),
+        num_of_contents: '5'
+      });
+      const response = await fetch(`/api/study-questions?${queryParams}`, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          courseId,
-          unitIds,
-        }),
+          'Content-Type': 'application/json'
+        }
       });
 
       if (!response.ok) {
@@ -57,7 +57,12 @@ export const useStudySession = (courseId: string, unitIds: string[]) => {
       }
 
       const data = await response.json();
-      setQuestions(data.questions);
+      // API'den gelen flashcards'ı dönüştürüyoruz
+      const formattedQuestions = (data.flashcards || []).map((q: Question) => ({
+        ...q,
+        possible_answers: q.possible_answers.join(', ') // Şıkları birleştiriyoruz
+      }));
+      setQuestions(formattedQuestions);
       setCurrentQuestionIndex(0);
       setAnswers([]);
     } catch (err) {
@@ -69,29 +74,41 @@ export const useStudySession = (courseId: string, unitIds: string[]) => {
   }, [courseId, unitIds]);
 
   const handleAnswer = useCallback((answer: string) => {
-    setAnswers(prev => [...prev, answer]);
+    setAnswers((prev) => [...prev, answer]);
   }, []);
 
   const handleNextQuestion = useCallback(() => {
+    if (!questions) return;
+
     if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
+      setCurrentQuestionIndex((prev) => prev + 1);
     }
-  }, [currentQuestionIndex, questions.length]);
+  }, [currentQuestionIndex, questions]);
 
   const calculateMetrics = useCallback((): StudyMetrics => {
+    if (!questions.length) {
+      return {
+        totalQuestions: 0,
+        correctAnswers: 0,
+        learningOutcomeProgress: [],
+        sectionProgress: []
+      };
+    }
+
     const metrics: StudyMetrics = {
       totalQuestions: questions.length,
-      correctAnswers: answers.filter((answer, index) => 
-        answer === questions[index].correct_answer
+      correctAnswers: answers.filter(
+        (answer, index) => answer === questions[index]?.correct_answer
       ).length,
       learningOutcomeProgress: [],
       sectionProgress: []
     };
 
-    // Kazanım ilerlemesini hesapla
     const outcomeMap = new Map<string, { correct: number; total: number }>();
     questions.forEach((q, idx) => {
-      q.learning_outcomes.forEach(outcome => {
+      if (!q) return;
+
+      q.learning_outcomes.forEach((outcome) => {
         if (!outcomeMap.has(outcome)) {
           outcomeMap.set(outcome, { correct: 0, total: 0 });
         }
@@ -107,22 +124,26 @@ export const useStudySession = (courseId: string, unitIds: string[]) => {
       ([outcomeCode, stats]) => ({
         outcomeCode,
         correctCount: stats.correct,
-        totalCount: stats.total,
+        totalCount: stats.total
       })
     );
 
-    // Bölüm ilerlemesini hesapla
-    const sectionMap = new Map<string, { 
-      correct: number; 
-      total: number;
-      scoreSum: number;
-    }>();
-    
+    const sectionMap = new Map<
+      string,
+      {
+        correct: number;
+        total: number;
+        scoreSum: number;
+      }
+    >();
+
     questions.forEach((q, idx) => {
-      q.relevant_sections.forEach(section => {
+      if (!q) return;
+
+      q.relevant_sections.forEach((section) => {
         if (!sectionMap.has(section.section_title)) {
-          sectionMap.set(section.section_title, { 
-            correct: 0, 
+          sectionMap.set(section.section_title, {
+            correct: 0,
             total: 0,
             scoreSum: 0
           });
@@ -141,7 +162,7 @@ export const useStudySession = (courseId: string, unitIds: string[]) => {
         sectionTitle,
         correctCount: stats.correct,
         totalCount: stats.total,
-        averageScore: stats.scoreSum / stats.total,
+        averageScore: stats.scoreSum / stats.total
       })
     );
 
@@ -163,8 +184,10 @@ export const useStudySession = (courseId: string, unitIds: string[]) => {
     isComplete: answers.length === questions.length,
     progress: {
       current: currentQuestionIndex + 1,
-      total: questions.length,
-      percentage: questions.length ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0
+      total: questions.length || 0,
+      percentage: questions.length
+        ? ((currentQuestionIndex + 1) / questions.length) * 100
+        : 0
     },
     metrics: calculateMetrics(),
     handleAnswer,

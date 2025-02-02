@@ -29,65 +29,72 @@ export const useFlashcardSystem = ({
     }
   }, [status, startTime]);
 
-  const handleGenerateFlashcards = useCallback(async (course: string, units: string[]) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch('/api/generate-flashcards', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ course, units }),
-      });
+  const handleGenerateFlashcards = useCallback(
+    async (course: string, units: string[]) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('/api/generate-flashcards', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ course, units })
+        });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate flashcards');
-      }
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to generate flashcards');
+        }
 
-      const data = await response.json();
-      const cards = enableShuffling 
-        ? shuffleFlashcards(data.flashcards)
-        : data.flashcards;
+        const data = await response.json();
+        const cards = enableShuffling
+          ? shuffleFlashcards(data.flashcards)
+          : data.flashcards;
 
-      setFlashcards(cards);
-      setCurrentIndex(0);
-      setIsFlipped(false);
-      setSessions([]);
-      setStartTime(Date.now());
-      setStatus(StudyStatus.IN_PROGRESS);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
-      console.error('Error generating flashcards:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [enableShuffling]);
-
-  const handleDifficultySelect = useCallback((difficulty: Difficulty) => {
-    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-    
-    const newSession: StudySession = {
-      cardId: flashcards[currentIndex].id,
-      timeSpent,
-      isCorrect: difficulty === Difficulty.EASY,
-      difficulty,
-      timestamp: new Date(),
-    };
-
-    setSessions(prev => [...prev, newSession]);
-    setStartTime(Date.now());
-
-    if (currentIndex === flashcards.length - 1) {
-      setStatus(StudyStatus.COMPLETED);
-      onComplete?.(sessions);
-    } else {
-      setTimeout(() => {
-        setCurrentIndex(prev => prev + 1);
+        setFlashcards(cards);
+        setCurrentIndex(0);
         setIsFlipped(false);
-      }, 300);
-    }
-  }, [currentIndex, flashcards, sessions, startTime, onComplete]);
+        setSessions([]);
+        setStartTime(Date.now());
+        setStatus(StudyStatus.IN_PROGRESS);
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'An error occurred');
+        console.error('Error generating flashcards:', error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [enableShuffling]
+  );
+
+  const handleDifficultySelect = useCallback(
+    (difficulty: Difficulty) => {
+      const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+      const newSession: StudySession = {
+        cardId: flashcards[currentIndex].id,
+        timeSpent,
+        isCorrect: difficulty === Difficulty.EASY,
+        difficulty,
+        timestamp: new Date()
+      };
+
+      setSessions((prev) => [...prev, newSession]);
+      setStartTime(Date.now());
+
+      if (currentIndex === flashcards.length - 1) {
+        setStatus(StudyStatus.COMPLETED);
+        onComplete?.(sessions);
+      } else {
+        setTimeout(() => {
+          setCurrentIndex((prev) => prev + 1);
+          setIsFlipped(false);
+        }, 300);
+      }
+    },
+    [currentIndex, flashcards, sessions, startTime, onComplete]
+  );
 
   const reset = useCallback(() => {
     setFlashcards([]);
@@ -110,6 +117,6 @@ export const useFlashcardSystem = ({
     loading,
     handleGenerateFlashcards,
     handleDifficultySelect,
-    reset,
+    reset
   };
 };

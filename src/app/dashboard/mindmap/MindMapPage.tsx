@@ -45,14 +45,20 @@ export default function MindMapPage() {
     setError(null);
 
     try {
+      const selectedUnitLabel = SAMPLE_UNITS.find(
+        (unit) => unit.value === selectedUnit
+      )?.label;
+      const selectedCourseLabel = SAMPLE_UNITS.find(
+        (course) => course.value === selectedCourse
+      )?.label;
       const response = await fetch('/api/mindmap/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          courseId: selectedCourse,
-          unitId: selectedUnit
+          courseId: selectedCourseLabel,
+          unitId: selectedUnitLabel
         })
       });
 

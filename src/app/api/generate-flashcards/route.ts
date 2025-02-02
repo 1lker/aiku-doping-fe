@@ -1,48 +1,56 @@
-// src/app/api/flashcards/route.ts
-
 import { NextResponse } from 'next/server';
-import { Flashcard } from '@/types/flashcard';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(req: Request) {
   try {
-    const { course, units } = await req.json();
+    const body = await req.json();
 
     // Validate request
-    if (!course || !units || !Array.isArray(units) || units.length === 0) {
+    if (
+      !body.course_content_urls ||
+      !Array.isArray(body.course_content_urls) ||
+      body.course_content_urls.length === 0
+    ) {
       return NextResponse.json(
         { error: 'Invalid request parameters' },
         { status: 400 }
       );
     }
 
-    // Burada kendi API'nize istek atabilirsiniz
-    // Örnek olarak mock data döndürüyorum:
-    const mockFlashcards: Flashcard[] = [
+    // Gerçek API'ye istek at
+    const response = await fetch(
+      'https://ad47-188-119-16-233.ngrok-free.app/generate-flashcards',
       {
-        id: uuidv4(),
-        question: "Sindirim sistemi içerisinde besinlerin kimyasal sindirimi hangi organlarda başlar?",
-        answer: "Besinlerin kimyasal sindirimi ağızda başlar ve mide ile ince bağırsakta devam eder."
-      },
-      {
-        id: uuidv4(),
-        question: "Kan dolaşımı sisteminin ana bileşeni nedir ve bu bileşenin temel işlevi nedir?",
-        answer: "Kan dolaşımı sisteminin ana bileşeni kalptir. Kalbin temel işlevi, kanı vücudun her yerine pompalamak ve böylece oksijen ve besinlerin hücrelere taşınmasını sağlamaktır."
-      },
-      {
-        id: uuidv4(),
-        question: "Lenf ve kan dolaşımı arasındaki ilişki nedir?",
-        answer: "Lenf dolaşımı, kan dolaşımı sistemine paralel çalışır ve vücuttan toksinlerin, atık maddelerin temizlenmesine yardımcı olur. Aynı zamanda lenf-kan dolaşımı ilişkisi, bağışıklık sisteminin bir parçası olarak patojenlere karşı koruma sağlar."
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          course_content_urls: body.course_content_urls,
+          num_questions: body.num_questions || 3
+        })
       }
-    ];
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch flashcards');
+    }
+
+    const data = await response.json();
+
+    // Gelen datayı istenen formata dönüştür
+    const formattedFlashcards = data.flashcards.map((card: any) => ({
+      id: uuidv4(),
+      question: card.question,
+      answer: card.answer
+    }));
 
     // Response
     return NextResponse.json({
-      timestamp: new Date().toISOString(),
-      url: "https://ogmmateryal.eba.gov.tr/panel/upload/pdf/rcyiodzbvw3.pdf",
-      flashcards: mockFlashcards
+      timestamp: data.timestamp,
+      url: body.course_content_urls[0], // İlk URL'i döndür
+      flashcards: formattedFlashcards
     });
-
   } catch (error) {
     console.error('Error generating flashcards:', error);
     return NextResponse.json(
